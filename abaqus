@@ -1,0 +1,78 @@
+#!/bin/bash
+# Cups backend to run Abaqus solver
+# Carl Osterwisch, September 2012
+#
+# Part of "Abacups" - See also:
+# /usr/share/cups/mime/abaqus.convs Define filters to convert into abaqus-inp
+# /usr/share/cups/mime/abaqus.types Mime type definition for abaqus-inp file
+# /usr/share/cups/model/abaqus.ppd  Printer definition
+# /usr/lib/cups/backend/abaqus      Cups backend to run Abaqus solver
+# /usr/lib/cups/filter/texttoinp    Cups filter to reformat text into abaqus-inp
+
+# Output "device discovery" information on stdout:
+if [ "$#" = "0" ]
+then # device-class scheme "Unknown" "device-info" "device-id"
+    echo 'direct abaqus: "abaqus" "Abaqus solver queue" "MFG:Abacups;MDL:Abaqus solver;CMD:none;"'
+    exit 0
+fi
+
+# CUPS filter/backend arguments:
+# $1 The job ID
+# $2 The user printing the job
+# $3 The job name/title
+# $4 The number of copies
+# $5 The options that were provided when the job was submitted
+# $6 The file to print (blank for stdin)
+
+for o in $5 # parse options
+do
+    if [[ $o =~ solver=(.*) ]]
+    then
+        ABAQUS=${BASH_REMATCH[1]}
+    fi
+done
+ABAQUS=/opt/abaqus/Commands/${ABAQUS-abaqus} # default
+
+test -x $ABAQUS || { echo ERROR:\"$ABAQUS\" not executable>&2; exit 1; }
+
+# Set INPUTFILE to where the input comes from:
+test -n "$6" && INPUTFILE="$6" || INPUTFILE="-"
+
+# How to terminate a running job?
+# trap 'kill $(jobs -p)' SIGTERM
+
+umask 0002
+case ${FINAL_CONTENT_TYPE-$CONTENT_TYPE} in
+    (*-inp) # Abaqus input file
+        OUTDIR=${DEVICE_URI#*:}/$2_${3%.*}_$1
+        mkdir -p "$OUTDIR" || { echo ERROR:\"$OUTDIR\" cannot be created by $(whoami)>&2; exit 1; }
+        cd "$OUTDIR" || exit 1
+        JOBNAME=${3%.*}
+        cat "$INPUTFILE" > $JOBNAME.inp || exit 1 # Copy inp file
+        USER=$2 $ABAQUS int job=$JOBNAME cpus=$4 | # cpus from num-copies
+            tee $JOBNAME.log |  # Copy stdout to log file
+            gawk '{ print "INFO:"$0 }' 1>&2 # Report info to CUPS
+        echo PAGE: 1 1 >&2
+        ;;
+    (*-com) # Abaqus command file
+        read fullpath < "$INPUTFILE" # Path to .com file
+        test -r "$fullpath" || { echo ERROR:\"$fullpath\" not readable by $(whoami)>&2; exit 1; }
+        DIRNAME=$(dirname "$fullpath")
+        COMFILE=$(basename "$fullpath")
+        test -w "$DIRNAME" || { echo ERROR:\"$DIRNAME\" not writable by $(whoami)>&2; exit 1; }
+        cd "$DIRNAME" || exit 1
+
+    # How to terminate a running job?
+    # trap 'kill $(jobs -p)' SIGTERM
+    trap '$ABAQUS terminate job=${COMFILE%.com}' SIGTERM
+
+        USER=$2 $ABAQUS python "$COMFILE" |
+            tee "${COMFILE%.com}.log" | # Copy stdout to log file
+            gawk '{ print "INFO:"$0 }' 1>&2 # Report info to CUPS
+        echo PAGE: 1 1 >&2
+        ;;
+    (*)
+        echo ERROR:Unsupported filetype \"${FINAL_CONTENT_TYPE-$CONTENT_TYPE}\">&2
+        exit 1
+        ;;
+esac
