@@ -38,9 +38,6 @@ test -x $ABAQUS || { echo ERROR:\"$ABAQUS\" not executable>&2; exit 1; }
 # Set INPUTFILE to where the input comes from:
 test -n "$6" && INPUTFILE="$6" || INPUTFILE="-"
 
-# How to terminate a running job?
-# trap 'kill $(jobs -p)' SIGTERM
-
 umask 0002
 case ${FINAL_CONTENT_TYPE-$CONTENT_TYPE} in
     (*-inp) # Abaqus input file
