@@ -38,3 +38,5 @@ $INSTALL -v -m644 abaqus.convs $MIME
 $INSTALL -v -m644 abaqus.types $MIME
 $INSTALL -v -m644 abaqus.ppd   $PPD
 
+lpadmin -p abaqus -v abaqus: -D "Abaqus job queue" -E -P $PPD/abaqus.ppd
+service cups restart
