@@ -53,9 +53,9 @@ case $JOBFILE in
 	# Run as user $2
         su -l $2 -c "
             cd \"$DIRNAME\"
-            gawk '{ print \"INFO:\"\$0 }'" >&2 # Report info to CUPS
             $ABAQUS python \"$JOBFILE\" |
             tee \"${JOBFILE%.com}.log\" |
+            sed 's/^/INFO:'" >&2 # Report info to CUPS
         echo PAGE: 1 1 >&2
         ;;
     (*)
