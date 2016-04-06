@@ -57,6 +57,17 @@ case $JOBFILE in
             sed 's/^/INFO:'" >&2 # Report info to CUPS
         echo PAGE: 1 1 >&2
         ;;
+
+    (*.txt) # Text file used for testing: just copy to .log
+        # Run as user $2
+        su -l $2 -c "
+            cd \"$DIRNAME\" &&
+            cat \"$JOBFILE\" |
+            tee \"${JOBFILE%.txt}.log\" |
+            sed 's/^/INFO:'" >&2 # Report info to CUPS
+        echo PAGE: 1 1 >&2
+        ;;
+
     (*)
         echo ERROR:Unsupported filetype \"$JOBFILE\">&2
         exit 1
