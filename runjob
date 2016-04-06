@@ -1,17 +1,17 @@
 #!/bin/bash
-# Cups backend to run Abaqus solver
+# Cups backend to run CAE solvers
 # This file should be mode 500 so it runs as root
 # Carl Osterwisch, September 2012
 #
 # Part of "Abacups" - See also:
-# /usr/share/cups/mime/abaqus.types Mime type definition for abaqus-inp file
-# /usr/share/cups/model/abaqus.ppd  Printer definition
-# /usr/lib/cups/backend/abaqus      Cups backend to run Abaqus solver
+# /usr/share/cups/mime/runjob.types Mime type definition for filepath
+# /usr/share/cups/model/runjob.ppd  Printer definition
+# /usr/lib/cups/backend/runjob      Cups backend to run CAE solvers
 
 # Output "device discovery" information on stdout:
 if [ "$#" = "0" ]
 then # device-class scheme "Unknown" "device-info" "device-id"
-    echo 'direct abaqus: "abaqus" "Abaqus solver queue" "MFG:Abacups;MDL:Abaqus solver;CMD:none;"'
+    echo 'direct runjob: "runjob" "Job queue" "MFG:Abacups;MDL:CAE solver queue;CMD:none;"'
     exit 0
 fi
 

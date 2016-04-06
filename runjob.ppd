@@ -4,27 +4,24 @@
 *% Carl Osterwisch, September 2012
 *%
 *% Part of "Abacups" - See also:
-*% /usr/share/cups/mime/abaqus.convs Define filters to convert into abaqus-inp
-*% /usr/share/cups/mime/abaqus.types Mime type definition for abaqus-inp file
-*% /usr/share/cups/model/abaqus.ppd  Printer definition
-*% /usr/lib/cups/backend/abaqus      Cups backend to run Abaqus solver
-*% /usr/lib/cups/filter/texttoinp    Cups filter to reformat text into abaqus-inp
+*% /usr/share/cups/mime/runjob.types Mime type definition for filepath
+*% /usr/share/cups/model/runjob.ppd  Printer definition
+*% /usr/lib/cups/backend/runjob      Cups backend to run CAE solvers
 *FormatVersion:	"4.3"
 *FileVersion:	"1.1"
 *LanguageVersion: English
 *LanguageEncoding: ISOLatin1
-*PCFileName:	"ABAQUS.PPD"
+*PCFileName:	"RUNJOB.PPD"
 *Manufacturer:	"Abacups"
 *Product:	"(Generic)"
 *cupsVersion:   1.0
 *cupsManualCopies: True
 *cupsModelNumber:  2
-*cupsFilter:    "application/abaqus-inp 0 -"
-*cupsFilter:    "application/abaqus-com 0 -"
-*ModelName:     "Abaqus solver"
+*cupsFilter:    "application/fullpath-job 0 -"
+*ModelName:     "CAE solver queue"
 *ShortNickName: "Abaqus"
 *NickName:      "Abaqus"
-*1284DeviceID:  "MFG:Abacups;MDL:Abaqus solver;CMD:none;"
+*1284DeviceID:  "MFG:Abacups;MDL:CAE solver queue;CMD:none;"
 *PSVersion:	"(2017.000) 0"
 *LanguageLevel:	"2"
 *ColorDevice:	False

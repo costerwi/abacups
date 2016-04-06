@@ -2,9 +2,9 @@
 # Carl Osterwisch, September 2012
 #
 # Part of "Abacups" - See also:
-# /usr/share/cups/mime/abaqus.types Mime type definition for abaqus-inp file
-# /usr/share/cups/model/abaqus.ppd  Printer definition
-# /usr/lib/cups/backend/abaqus      Cups backend to run Abaqus solver
+# /usr/share/cups/mime/runjob.types Mime type definition for filepath
+# /usr/share/cups/model/runjob.ppd  Printer definition
+# /usr/lib/cups/backend/runjob      Cups backend to run CAE solvers
 
 # Following is meant to match a full-path to a submitted file
 application/fullpath-job		printable(0,1024) + string(0,"/") + contains(0,1024,".")

@@ -1,6 +1,6 @@
-# abacups
-Single computer Abaqus job queue using [CUPS](http://www.cups.org/) print spooler
+# Abacups
+Single computer job queue using [CUPS](http://www.cups.org/) print spooler
 
-Abaqus is run as the lp user so permissions must allow write access for that user to job and scratch directories.
+Un-install with lpadmin -x
 
-Having the print spooler execute Abaqus jobs is not compatible with default security policies in [SELinux](https://en.wikipedia.org/wiki/Security-Enhanced_Linux).
+Having the print spooler execute CAE jobs is not compatible with default security policies in [SELinux](https://en.wikipedia.org/wiki/Security-Enhanced_Linux).

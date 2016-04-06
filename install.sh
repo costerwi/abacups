@@ -31,9 +31,9 @@ do
 done
 test -n "$ERR" && exit $ERR
 
-$INSTALL -v -m500 abaqus       $BACKEND
-$INSTALL -v -m644 abaqus.types $MIME
-$INSTALL -v -m644 abaqus.ppd   $PPD
+$INSTALL -v -m500 runjob       $BACKEND
+$INSTALL -v -m644 runjob.types $MIME
+$INSTALL -v -m644 runjob.ppd   $PPD
 
-lpadmin -p abaqus -v abaqus: -D "Abaqus job queue" -E -P $PPD/abaqus.ppd
+lpadmin -p runjob -v runjob: -D "CAE job queue" -E -P $PPD/runjob.ppd
 service cups restart
