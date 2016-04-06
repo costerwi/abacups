@@ -2,14 +2,10 @@
 # Carl Osterwisch, September 2012
 #
 # Part of "Abacups" - See also:
-# /usr/share/cups/mime/abaqus.convs Define filters to convert into abaqus-inp
 # /usr/share/cups/mime/abaqus.types Mime type definition for abaqus-inp file
 # /usr/share/cups/model/abaqus.ppd  Printer definition
 # /usr/lib/cups/backend/abaqus      Cups backend to run Abaqus solver
-# /usr/lib/cups/filter/texttoinp    Cups filter to reformat text into abaqus-inp
 
-application/abaqus-inp		inp printable(0,1024) + string(0,"*")
-
-# Following is meant to be a full-path to the .com file
-application/abaqus-com		printable(0,1024) + string(0,"/") + contains(0,1024,".com")
+# Following is meant to match a full-path to a submitted file
+application/fullpath-job		printable(0,1024) + string(0,"/") + contains(0,1024,".")
 

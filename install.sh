@@ -6,14 +6,13 @@ LIB=$PREFIX/lib
 SHARE=$PREFIX/share
 
 BACKEND=$LIB/cups/backend
-FILTER=$LIB/cups/filter
 MIME=$SHARE/cups/mime
 PPD=$SHARE/cups/model
 
 INSTALL=install
 
 echo Checking directories...
-for d in $BACKEND $FILTER $MIME $PPD
+for d in $BACKEND $MIME $PPD
 do
     echo -n $d
     if test -d $d
@@ -32,9 +31,7 @@ do
 done
 test -n "$ERR" && exit $ERR
 
-$INSTALL -v       abaqus       $BACKEND
-$INSTALL -v       texttoinp    $FILTER
-$INSTALL -v -m644 abaqus.convs $MIME
+$INSTALL -v -m500 abaqus       $BACKEND
 $INSTALL -v -m644 abaqus.types $MIME
 $INSTALL -v -m644 abaqus.ppd   $PPD
 
