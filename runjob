@@ -41,25 +41,25 @@ test -n "$6" && INPUTFILE="$6" || INPUTFILE="-"
 # This backend expects you to "print" the full path to an input file
 read fullpath < "$INPUTFILE"
 DIRNAME=$(dirname "$fullpath")
-COMFILE=$(basename "$fullpath")
+JOBFILE=$(basename "$fullpath")
 
-case $COMFILE in
+case $JOBFILE in
     (*.com|*.COM) # Abaqus command file
 
         # How to terminate a running job? This doesn't seem to work.
         # trap 'kill $(jobs -p)' SIGTERM
-        trap '$ABAQUS terminate job=${COMFILE%.com}' SIGTERM
+        trap '$ABAQUS terminate job=${JOBFILE%.com}' SIGTERM
 
 	# Run as user $2
         su -l $2 -c "
             cd $DIRNAME
-            $ABAQUS python \"$COMFILE\" |
-            tee \"${COMFILE%.com}.log\" |
             gawk '{ print \"INFO:\"\$0 }'" >&2 # Report info to CUPS
+            $ABAQUS python \"$JOBFILE\" |
+            tee \"${JOBFILE%.com}.log\" |
         echo PAGE: 1 1 >&2
         ;;
     (*)
-        echo ERROR:Unsupported filetype \"$COMFILE\">&2
+        echo ERROR:Unsupported filetype \"$JOBFILE\">&2
         exit 1
         ;;
 esac
