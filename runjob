@@ -44,15 +44,14 @@ DIRNAME=$(dirname "$fullpath")
 JOBFILE=$(basename "$fullpath")
 
 case $JOBFILE in
-    (*.com|*.COM) # Abaqus command file
-
+    (*.com) # Abaqus command file
         # How to terminate a running job? This doesn't seem to work.
         # trap 'kill $(jobs -p)' SIGTERM
-        trap '$ABAQUS terminate job=${JOBFILE%.com}' SIGTERM
+        # trap '$ABAQUS terminate job=${JOBFILE%.com}' SIGTERM
 
-	# Run as user $2
+        # Run as user $2
         su -l $2 -c "
-            cd \"$DIRNAME\"
+            cd \"$DIRNAME\" &&
             $ABAQUS python \"$JOBFILE\" |
             tee \"${JOBFILE%.com}.log\" |
             sed 's/^/INFO:'" >&2 # Report info to CUPS
