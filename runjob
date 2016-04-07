@@ -54,17 +54,18 @@ case $JOBFILE in
             cd \"$DIRNAME\" &&
             $ABAQUS python \"$JOBFILE\" |
             tee \"${JOBFILE%.com}.log\" |
-            sed 's/^/INFO:'" >&2 # Report info to CUPS
+            sed 's/^/INFO:/'" >&2 # Report info to CUPS
         echo PAGE: 1 1 >&2
         ;;
 
     (*.txt) # Text file used for testing: just copy to .log
+        sleep 10
         # Run as user $2
         su -l $2 -c "
             cd \"$DIRNAME\" &&
             cat \"$JOBFILE\" |
             tee \"${JOBFILE%.txt}.log\" |
-            sed 's/^/INFO:'" >&2 # Report info to CUPS
+            sed 's/^/INFO:/'" >&2 # Report info to CUPS
         echo PAGE: 1 1 >&2
         ;;
 
