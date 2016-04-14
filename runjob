@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/python
 # Cups backend to run CAE solvers
 # This file should be mode 500 so it runs as root
 # Carl Osterwisch, September 2012
@@ -8,12 +8,18 @@
 # /usr/share/cups/model/runjob.ppd  Printer definition
 # /usr/lib/cups/backend/runjob      Cups backend to run CAE solvers
 
+
+from __future__ import print_function, with_statement
+import os
+import sys
+import pwd
+import subprocess
+
 # Output "device discovery" information on stdout:
-if [ "$#" = "0" ]
-then # device-class scheme "Unknown" "device-info" "device-id"
-    echo 'direct runjob: "runjob" "Job queue" "MFG:Abacups;MDL:CAE solver queue;CMD:none;"'
-    exit 0
-fi
+if len(sys.argv) < 3:
+    print('direct runjob: "runjob" "Job queue"'
+          ' "MFG:Abacups;MDL:CAE solver queue;CMD:none;"')
+    sys.exit(0)
 
 # CUPS filter/backend arguments:
 # $1 The job ID
@@ -23,54 +29,28 @@ fi
 # $5 The options that were provided when the job was submitted
 # $6 The file to print (blank for stdin)
 
-# Parse options
-for o in $5
-do
-    if [[ $o =~ abaqus=(.*) ]]
-    then
-        ABAQUSVER=${BASH_REMATCH[1]}
-    fi
-done
-ABAQUS=/opt/abaqus/Commands/${ABAQUSVER-abaqus} # default
-
-test -x $ABAQUS || { echo ERROR:\"$ABAQUS\" not executable>&2; exit 1; }
-
 # Set INPUTFILE to where the input comes from:
-test -n "$6" && INPUTFILE="$6" || INPUTFILE="-"
+if len(sys.argv) < 7:
+    jobFile = sys.stdin.readline().strip()
+else:
+    with open(sys.argv[6]) as f:
+        jobFile = f.readline().strip()
 
-# This backend expects you to "print" the full path to an input file
-read fullpath < "$INPUTFILE"
-DIRNAME=$(dirname "$fullpath")
-JOBFILE=$(basename "$fullpath")
+# Switch to user
+pw = pwd.getpwnam(sys.argv[2])
+os.setgid(pw.pw_gid)
+os.setuid(pw.pw_uid)
+os.environ['USER'] = pw.pw_name
+os.environ['HOME'] = pw.pw_dir
 
-case $JOBFILE in
-    (*.com) # Abaqus command file
-        # How to terminate a running job? This doesn't seem to work.
-        # trap 'kill $(jobs -p)' SIGTERM
-        # trap '$ABAQUS terminate job=${JOBFILE%.com}' SIGTERM
+# Run the command
+d = os.path.dirname(jobFile)
+os.environ['PBS_O_WORKDIR'] = d
+try:
+    with open(os.path.splitext(jobFile)[0] + '.log', 'w') as outfile:
+        subprocess.call(jobFile, stdout=outfile)
+except ValueError as e:
+#except OSError as e:
+    print('INFO:{0}\nINFO:{1}'.format(jobFile, e))
 
-        # Run as user $2
-        su -l $2 -c "
-            cd \"$DIRNAME\" &&
-            $ABAQUS python \"$JOBFILE\" |
-            tee \"${JOBFILE%.com}.log\" |
-            sed 's/^/INFO:/'" >&2 # Report info to CUPS
-        echo PAGE: 1 1 >&2
-        ;;
-
-    (*.txt) # Text file used for testing: just copy to .log
-        sleep 10
-        # Run as user $2
-        su -l $2 -c "
-            cd \"$DIRNAME\" &&
-            cat \"$JOBFILE\" |
-            tee \"${JOBFILE%.txt}.log\" |
-            sed 's/^/INFO:/'" >&2 # Report info to CUPS
-        echo PAGE: 1 1 >&2
-        ;;
-
-    (*)
-        echo ERROR:Unsupported filetype \"$JOBFILE\">&2
-        exit 1
-        ;;
-esac
+sys.exit(0)
