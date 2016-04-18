@@ -50,8 +50,7 @@ os.environ['PBS_O_WORKDIR'] = d
 try:
     with open(os.path.splitext(jobFile)[0] + '.log', 'w') as outfile:
         subprocess.call(jobFile, stdout=outfile)
-except ValueError as e:
-#except OSError as e:
+except OSError as e:
     print('INFO:{0}\nINFO:{1}'.format(jobFile, e))
 
 sys.exit(0)
