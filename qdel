@@ -1,0 +1,7 @@
+#!/bin/bash
+if [ $# -eq 1 ]
+then
+    exec /usr/bin/lprm -P runjob $@
+fi
+echo You must specify a job number
+exit 1
