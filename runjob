@@ -14,6 +14,7 @@ import os
 import sys
 import pwd
 import subprocess
+from signal import signal, SIGTERM
 
 # Output "device discovery" information on stdout:
 if len(sys.argv) < 3:
@@ -44,12 +45,22 @@ os.environ['USER'] = pw.pw_name
 os.environ['HOME'] = pw.pw_dir
 os.umask(0o002)
 
+job = None
+def killjob(sig, frame):
+    "Pass SIGTERM signal to all child processes in the process group"
+    if job:
+        os.killpg(job.pid, SIGTERM)
+signal(SIGTERM, killjob) # assign handler for SIGTERM
+
 # Run the command
 d = os.path.dirname(jobFile)
 os.environ['PBS_O_WORKDIR'] = d
 try:
     with open(os.path.splitext(jobFile)[0] + '.log', 'w') as outfile:
-        subprocess.call(jobFile, stdout=outfile)
+        job = subprocess.Popen(jobFile,
+            stdout = outfile,
+            preexec_fn = os.setsid)
+        job.communicate() # Interact with and wait for job to finish
 except OSError as e:
     print('INFO:{0}\nINFO:{1}'.format(jobFile, e))
 
