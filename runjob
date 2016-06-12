@@ -53,15 +53,17 @@ def killjob(sig, frame):
 signal(SIGTERM, killjob) # assign handler for SIGTERM
 
 # Run the command
-d = os.path.dirname(jobFile)
-os.environ['PBS_O_WORKDIR'] = d
 try:
     with open(os.path.splitext(jobFile)[0] + '.log', 'w') as outfile:
         job = subprocess.Popen(jobFile,
             stdout = outfile,
+            stderr = subprocess.PIPE,
+            cwd = os.path.dirname(jobFile),
             preexec_fn = os.setsid)
-        job.communicate() # Interact with and wait for job to finish
+        out, err = job.communicate() # wait for job to finish
+        for line in err.splitlines():
+            print('INFO:{0}'.format(line.decode()), file=sys.stderr)
 except OSError as e:
-    print('INFO:{0}\nINFO:{1}'.format(jobFile, e))
+    print('INFO:{0}\nINFO:{1}'.format(jobFile, e), file=sys.stderr)
 
 sys.exit(0)
