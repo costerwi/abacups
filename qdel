@@ -1,7 +1,12 @@
 #!/bin/bash
-if [ $# -eq 1 ]
+
+if [ $# -eq 0 ]
 then
-    exec /usr/bin/lprm -P runjob $@
+    echo qdel: You must specify a job number >&2
+    exit 1
 fi
-echo You must specify a job number
-exit 1
+
+for jid in "$@"
+do
+    /usr/bin/lprm -P runjob "$jid"
+done
