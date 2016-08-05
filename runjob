@@ -12,7 +12,7 @@
 from __future__ import print_function, with_statement
 import os
 import sys
-import pwd
+import pwd, grp
 import subprocess
 from signal import signal, SIGTERM
 
@@ -40,6 +40,7 @@ else:
 # Switch to user
 pw = pwd.getpwnam(sys.argv[2])
 os.setgid(pw.pw_gid)
+os.setgroups([g.gr_gid for g in grp.getgrall() if pw.pw_name in g.gr_mem])
 os.setuid(pw.pw_uid)
 os.environ['USER'] = pw.pw_name
 os.environ['HOME'] = pw.pw_dir
