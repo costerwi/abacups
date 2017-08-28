@@ -11,30 +11,37 @@ PPD=$SHARE/cups/model
 
 INSTALL=install
 
+error=$(tput setaf 1)ERROR:$(tput sgr 0) || error="ERROR:"
+warning=$(tput setab 3)WARNING:$(tput sgr 0) || warning="WARNING:"
+
+echo Checking system...
 if [ ! -x "${PYTHON:=$(type -p python3 || type -p python)}" ]
 then
-    echo "Error: python '$PYTHON' is not executable"
+    echo $error python '$PYTHON' is not executable
     ERR=1
-else
-echo Checking directories...
+fi
+
+if selinuxenabled
+then
+    echo $warning selinux is $(getenforce)
+fi
+
 for d in $BACKEND $MIME $PPD
 do
-    echo -n $d
     if test -d $d
     then
         if test -w $d
         then
-            echo " exists and is writable."
+            echo $d exists and is writable.
         else
             ERR=1
-            echo " exists but is not writable by $(whoami).  Should login as root."
+            echo $error $d exists but is not writable by $(whoami).  Should login as root.
         fi
     else
         ERR=1
-        echo " does not exist.  Check CUPS installation."
+        echo $error $d does not exist.  Check CUPS installation.
     fi
 done
-fi
 test -n "$ERR" && exit $ERR
 
 if ! grep -q !$PYTHON runjob
@@ -50,3 +57,4 @@ $INSTALL -v -m644 runjob.ppd   $PPD
 
 lpadmin -p runjob -v runjob: -D "CAE job queue" -E -P $PPD/runjob.ppd
 service cups restart
+
