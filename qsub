@@ -1,0 +1,20 @@
+#!/bin/env python
+"""Submit scripts to runjob queue
+"""
+from __future__ import print_function, with_statement
+
+import sys
+import os
+from subprocess import Popen, PIPE
+
+for j in sys.argv[1:]:
+    if not os.path.isfile(j):
+        print(j, 'does not exist')
+    elif not os.access(j, os.X_OK):
+        print(j, 'is not executable')
+    else:
+        proc = Popen('lpr -P %r -J %r'%(
+            'runjob', os.path.basename(j)), 
+            shell=True, stdin=PIPE)
+        proc.communicate(input=os.path.abspath(j))
+
