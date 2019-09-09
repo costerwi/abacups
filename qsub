@@ -1,5 +1,5 @@
 #!/bin/env python
-"""Submit scripts to runjob queue
+"""Submit scripts to CUPS runjob queue
 """
 from __future__ import print_function, with_statement
 
@@ -13,8 +13,10 @@ for j in sys.argv[1:]:
     elif not os.access(j, os.X_OK):
         print(j, 'is not executable')
     else:
-        proc = Popen('lpr -P %r -J %r'%(
-            'runjob', os.path.basename(j)), 
-            shell=True, stdin=PIPE)
+        proc = Popen(
+            'lpr -P %r -J %r'%('runjob', os.path.basename(j)), 
+            shell=True,
+            stdin=PIPE,
+        )
         proc.communicate(input=os.path.abspath(j))
 

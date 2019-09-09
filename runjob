@@ -58,7 +58,8 @@ signal(SIGTERM, killjob) # assign handler for SIGTERM
 # Run the command
 try:
     with open(os.path.splitext(jobFile)[0] + '.log', 'w') as outfile:
-        job = subprocess.Popen(jobFile,
+        job = subprocess.Popen(
+            jobFile,
             stdout = outfile,
             stderr = subprocess.STDOUT,
             cwd = os.path.dirname(jobFile),
