@@ -1,12 +1,14 @@
-#!/usr/bin/python
-# Cups backend to run CAE solvers
-# This file should be mode 500 so it runs as root
-# Carl Osterwisch, September 2012
-#
-# Part of "Abacups" - See also:
-# /usr/share/cups/mime/runjob.types Mime type definition for filepath
-# /usr/share/cups/model/runjob.ppd  Printer definition
-# /usr/lib/cups/backend/runjob      Cups backend to run CAE solvers
+#!/usr/bin/python3
+"""Cups backend to run CAE solvers
+
+This file should be mode 500 so it runs as root
+Carl Osterwisch, September 2012
+
+Part of "Abacups" - See also:
+/usr/share/cups/mime/runjob.types Mime type definition for filepath
+/usr/share/cups/model/runjob.ppd  Printer definition
+/usr/lib/cups/backend/runjob      Cups backend to run CAE solvers
+"""
 
 
 from __future__ import print_function, with_statement
@@ -44,7 +46,7 @@ os.setgroups([g.gr_gid for g in grp.getgrall() if pw.pw_name in g.gr_mem])
 os.setuid(pw.pw_uid)
 os.environ['USER'] = pw.pw_name
 os.environ['HOME'] = pw.pw_dir
-if os.environ.has_key('TMPDIR'):
+if 'TMPDIR' in os.environ:
     del os.environ['TMPDIR']
 os.umask(0o002)
 

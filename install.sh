@@ -11,6 +11,11 @@ PPD=$SHARE/cups/model
 
 INSTALL=install
 
+if [ ! -x "${PYTHON:=$(type -p python3 || type -p python)}" ]
+then
+    echo "Error: python '$PYTHON' is not executable"
+    ERR=1
+else
 echo Checking directories...
 for d in $BACKEND $MIME $PPD
 do
@@ -29,7 +34,15 @@ do
         echo " does not exist.  Check CUPS installation."
     fi
 done
+fi
 test -n "$ERR" && exit $ERR
+
+if ! grep -q !$PYTHON runjob
+then
+    echo Updating scripts to use $PYTHON
+    sed -i -e 1s:!.*:!$PYTHON: runjob
+    sed -i -e 1s:!.*:!$PYTHON: qsub
+fi
 
 $INSTALL -v -m500 runjob       $BACKEND
 $INSTALL -v -m644 runjob.types $MIME

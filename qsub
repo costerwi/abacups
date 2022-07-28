@@ -1,5 +1,7 @@
-#!/bin/env python
+#!/usr/bin/python3
 """Submit scripts to CUPS runjob queue
+
+Carl Osterwisch
 """
 from __future__ import print_function, with_statement
 
@@ -18,5 +20,5 @@ for j in sys.argv[1:]:
             shell=True,
             stdin=PIPE,
         )
-        proc.communicate(input=os.path.abspath(j))
+        proc.communicate(input=os.path.abspath(j).encode())
 
